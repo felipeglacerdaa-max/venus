@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Roxo escuro profundo — identidade Venus */
+    --venus-void: 270 55% 3%;
+    --venus-deep: 272 50% 6%;
+    --venus-plum: 275 45% 11%;
+    --venus-violet: 278 55% 38%;
+    --venus-magenta: 285 50% 48%;
+    --venus-rose: 290 45% 62%;
+    --venus-frost: 270 15% 93%;
+    --venus-muted: 270 18% 48%;
+
+    --background: var(--venus-void);
+    --foreground: var(--venus-frost);
+    --card: 272 48% 7%;
+    --card-foreground: var(--venus-frost);
+    --primary: var(--venus-violet);
+    --primary-foreground: 0 0% 100%;
+    --secondary: var(--venus-plum);
+    --secondary-foreground: var(--venus-frost);
+    --muted: var(--venus-plum);
+    --muted-foreground: var(--venus-muted);
+    --accent: 275 40% 16%;
+    --accent-foreground: var(--venus-frost);
+    --border: 272 35% 14%;
+    --input: 272 40% 9%;
+    --ring: var(--venus-violet);
+    --radius: 0.75rem;
+  }
+
+  .light {
+    --venus-void: 270 25% 96%;
+    --venus-deep: 270 20% 92%;
+    --venus-plum: 275 30% 85%;
+    --venus-violet: 278 55% 42%;
+    --venus-magenta: 285 50% 45%;
+    --venus-rose: 290 45% 55%;
+    --venus-frost: 272 45% 14%;
+    --venus-muted: 270 15% 40%;
+
+    --background: var(--venus-void);
+    --foreground: var(--venus-frost);
+    --card: 0 0% 100%;
+    --card-foreground: var(--venus-frost);
+    --border: 270 20% 86%;
+    --input: 270 18% 90%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    @apply antialiased;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    background-color: hsl(var(--venus-void));
+    background-image:
+      radial-gradient(
+        ellipse 120% 80% at 50% -30%,
+        hsl(275 60% 18% / 0.45),
+        transparent 55%
+      ),
+      radial-gradient(
+        ellipse 70% 50% at 100% 80%,
+        hsl(280 50% 12% / 0.35),
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse 60% 40% at 0% 60%,
+        hsl(270 55% 10% / 0.3),
+        transparent 45%
+      );
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: hsl(var(--venus-violet) / 0.4);
+    color: hsl(var(--venus-frost));
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--venus-violet) / 0.25);
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--venus-violet) / 0.4);
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply border border-violet-400/10 bg-violet-950/30 backdrop-blur-xl;
+    box-shadow:
+      0 4px 24px -4px rgba(0, 0, 0, 0.5),
+      inset 0 1px 0 0 hsl(275 60% 70% / 0.06);
+  }
+
+  .light .glass-panel {
+    @apply border-violet-300/30 bg-white/75;
+    box-shadow:
+      0 4px 24px -4px rgba(30, 10, 60, 0.08),
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .glass-input {
+    @apply border border-violet-400/15 bg-violet-950/40 backdrop-blur-2xl;
+    box-shadow:
+      0 0 0 1px hsl(275 50% 20% / 0.2),
+      0 8px 32px -8px rgba(0, 0, 0, 0.55);
+  }
+
+  .light .glass-input {
+    @apply border-violet-200/50 bg-white/85;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-violet-300 via-violet-400 to-purple-500 bg-clip-text text-transparent;
+  }
+
+  .chat-input-shell {
+    @apply border border-violet-500/15 bg-violet-950/35 backdrop-blur-xl;
+    box-shadow:
+      0 0 0 1px hsl(275 40% 25% / 0.15),
+      0 8px 32px -12px rgba(0, 0, 0, 0.45);
+  }
+
+  .chat-input-shell:focus-within {
+    @apply border-violet-400/30;
+    box-shadow:
+      0 0 0 1px hsl(275 55% 50% / 0.2),
+      0 8px 40px -10px hsl(275 60% 30% / 0.15);
+  }
+}
