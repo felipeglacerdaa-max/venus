@@ -28,7 +28,7 @@ export function ChatHeader({ title, onMenuClick, onClearChat }: ChatHeaderProps)
           onClick={onMenuClick}
           aria-label="Abrir menu"
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
         </Button>
 
         <VenusAvatar size="md" />
@@ -53,7 +53,7 @@ export function ChatHeader({ title, onMenuClick, onClearChat }: ChatHeaderProps)
               onClick={onClearChat}
               aria-label="Limpar conversa"
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>Limpar chat</TooltipContent>

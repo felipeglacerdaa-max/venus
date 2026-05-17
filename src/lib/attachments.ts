@@ -1,12 +1,13 @@
 import { generateId } from "@/lib/utils";
-import type { AttachmentKind, OutgoingAttachment } from "@/types/chat";
+import type { OutgoingAttachment } from "@/types/chat";
+// Setup removed from top level to avoid SSR issues
 
 export const MAX_ATTACHMENTS = 5;
 export const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 export const MAX_TEXT_FILE_BYTES = 512 * 1024;
 
 export const ACCEPTED_FILE_INPUT =
-  "image/jpeg,image/png,image/gif,image/webp,.txt,.md,.json,.csv,.xml,.html,.css,.js,.ts,.tsx,.jsx,.py,.java,.c,.cpp,.h,.yaml,.yml,.pdf";
+  "image/jpeg,image/png,image/gif,image/webp,.txt,.md,.json,.csv,.xml,.html,.css,.js,.ts,.tsx,.jsx,.py,.java,.c,.cpp,.h,.yaml,.yml,.pdf,.doc,.docx";
 
 const TEXT_MIME_PREFIXES = ["text/", "application/json", "application/xml"];
 const TEXT_EXTENSIONS =
@@ -37,6 +38,35 @@ function readAsText(file: File): Promise<string> {
     reader.onerror = () => reject(new Error("Falha ao ler texto"));
     reader.readAsText(file, "utf-8");
   });
+}
+
+async function readPdfText(file: File): Promise<string> {
+  const pdfjsLib = await import("pdfjs-dist");
+  if (typeof window !== "undefined") {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
+  }
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let text = "";
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const strings = content.items.map((item) => {
+      if ("str" in item) {
+        return typeof item.str === "string" ? item.str : "";
+      }
+      return "";
+    });
+    text += strings.join(" ") + "\n";
+  }
+  return text;
+}
+
+async function readDocxText(file: File): Promise<string> {
+  const mammoth = (await import("mammoth")).default;
+  const arrayBuffer = await file.arrayBuffer();
+  const result = await mammoth.extractRawText({ arrayBuffer });
+  return result.value;
 }
 
 /** Gera preview JPEG comprimido para persistência e UI. */
@@ -88,11 +118,39 @@ export async function processFile(file: File): Promise<OutgoingAttachment> {
     };
   }
 
+  let textContent = "";
+  let isSupported = false;
+
   if (isTextLike(file)) {
     if (file.size > MAX_TEXT_FILE_BYTES) {
       throw new Error(`Arquivo de texto muito grande (máx. ${MAX_TEXT_FILE_BYTES / 1024}KB)`);
     }
-    const textContent = await readAsText(file);
+    textContent = await readAsText(file);
+    isSupported = true;
+  } else if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
+    try {
+      textContent = await readPdfText(file);
+      isSupported = true;
+    } catch (error) {
+      console.error("PDF Extraction Error:", error);
+      throw new Error("Falha ao extrair texto do PDF. Verifique se o arquivo não está corrompido ou protegido por senha.");
+    }
+  } else if (
+    file.name.toLowerCase().endsWith(".docx") ||
+    file.name.toLowerCase().endsWith(".doc") ||
+    file.type.includes("wordprocessingml") ||
+    file.type === "application/msword"
+  ) {
+    try {
+      textContent = await readDocxText(file);
+      isSupported = true;
+    } catch (error) {
+      console.error("DOCX Extraction Error:", error);
+      throw new Error("Falha ao extrair texto do documento Word.");
+    }
+  }
+
+  if (isSupported) {
     return {
       id,
       name: file.name,
@@ -101,12 +159,6 @@ export async function processFile(file: File): Promise<OutgoingAttachment> {
       size: file.size,
       textContent,
     };
-  }
-
-  if (file.type === "application/pdf") {
-    throw new Error(
-      "PDF ainda não é suportado. Exporte como .txt ou cole o conteúdo na mensagem."
-    );
   }
 
   throw new Error(`Tipo não suportado: ${file.name}`);
@@ -126,15 +178,22 @@ export function buildDisplayContent(
   const trimmed = text.trim();
   if (trimmed) parts.push(trimmed);
 
+  const fileParts: string[] = [];
   for (const a of attachments) {
     if (a.kind === "file" && a.textContent) {
-      parts.push(
-        `\n\n📄 **${a.name}**\n\`\`\`\n${a.textContent.slice(0, 12000)}${a.textContent.length > 12000 ? "\n…(truncado)" : ""}\n\`\`\``
+      fileParts.push(
+        `<document name="${a.name}">\n${a.textContent.slice(0, 8000)}${a.textContent.length > 8000 ? "\n[TRUNCATED]" : ""}\n</document>`
       );
     } else if (a.kind === "image") {
-      parts.push(`\n\n🖼️ *Imagem anexada: ${a.name}*`);
+      fileParts.push(`<image name="${a.name}" />`);
     }
   }
 
-  return parts.join("").trim() || "Analise os anexos enviados.";
+  if (fileParts.length > 0) {
+    parts.push(`\n\n<FILE_DATA>\n${fileParts.join("\n\n")}\n</FILE_DATA>`);
+  }
+
+  // Se não houver texto do usuário, mas houver arquivo, parts terá apenas a tag FILE_DATA.
+  // Isso garante que o bot receba o contexto mas a interface não renderize nada no texto.
+  return parts.join("").trim();
 }

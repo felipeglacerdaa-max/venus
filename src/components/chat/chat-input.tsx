@@ -134,10 +134,10 @@ export function ChatInput({
                   size="icon"
                   disabled={disabled || isStreaming || attachments.length >= MAX_ATTACHMENTS}
                   onClick={() => fileInputRef.current?.click()}
-                  className="h-10 w-10 shrink-0 rounded-xl text-venus-muted hover:bg-violet-500/10 hover:text-violet-300"
+                  className="h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-xl text-venus-muted hover:bg-violet-500/10 hover:text-violet-300 transition-colors"
                   aria-label="Anexar foto ou arquivo"
                 >
-                  <Paperclip className="h-5 w-5" />
+                  <Paperclip className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Fotos e arquivos (.txt, .md, .json…)</TooltipContent>
@@ -176,7 +176,7 @@ export function ChatInput({
                 size="icon"
                 variant="glass"
                 onClick={onStop}
-                className="h-10 w-10 shrink-0 rounded-xl"
+                className="h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-xl transition-transform hover:scale-105 active:scale-95"
                 aria-label="Parar"
               >
                 <Square className="h-4 w-4 fill-current" />
@@ -188,10 +188,10 @@ export function ChatInput({
                 onClick={submit}
                 disabled={!canSend}
                 className={cn(
-                  "h-10 w-10 shrink-0 rounded-xl transition-all duration-200",
+                  "h-9 w-9 sm:h-10 sm:w-10 shrink-0 rounded-xl transition-all duration-300",
                   canSend
-                    ? "bg-gradient-to-br from-violet-500 to-purple-700 text-white shadow-glow-sm hover:scale-[1.02] active:scale-[0.98]"
-                    : "bg-violet-900/40 text-venus-muted"
+                    ? "bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-md shadow-violet-500/20 hover:shadow-violet-500/40 hover:scale-[1.05] active:scale-[0.95]"
+                    : "bg-violet-900/20 text-venus-muted border border-violet-500/10"
                 )}
                 aria-label="Enviar"
               >

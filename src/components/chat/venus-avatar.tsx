@@ -9,10 +9,10 @@ interface VenusAvatarProps {
 }
 
 const sizeMap = {
-  sm: "h-10 w-10",
-  md: "h-14 w-14",
-  lg: "h-20 w-20",
-  xl: "h-28 w-28",
+  sm: "h-8 w-8 sm:h-9 sm:w-9",
+  md: "h-10 w-10 sm:h-12 sm:w-12",
+  lg: "h-16 w-16 sm:h-20 sm:w-20",
+  xl: "h-24 w-24 sm:h-28 sm:w-28",
 };
 
 /** Ícone do planeta Vênus — visual limpo, sem aura ou brilhos externos. */

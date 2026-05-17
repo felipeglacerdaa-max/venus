@@ -122,9 +122,13 @@ function MessageContent({
     );
   }
 
+  const visibleContent = content.split("<FILE_DATA>")[0].trim();
+
+  if (!visibleContent && !isStreaming) return null;
+
   return (
     <div className="whitespace-pre-wrap break-words">
-      {content}
+      {visibleContent}
       {isStreaming && content && (
         <span className="ml-0.5 inline-block h-4 w-0.5 animate-pulse-soft bg-violet-400 align-middle" />
       )}

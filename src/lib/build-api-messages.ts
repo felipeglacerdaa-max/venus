@@ -24,12 +24,6 @@ function buildUserContent(
           image_url: { url: a.dataUrl },
         });
       }
-      if (a.kind === "file" && a.textContent) {
-        parts.push({
-          type: "text",
-          text: `\n\n[Conteúdo do arquivo "${a.name}"]:\n${a.textContent.slice(0, 24000)}`,
-        });
-      }
     }
   }
 
@@ -52,7 +46,8 @@ export function buildApiMessages(
     .pop()?.i;
 
   messages.forEach((msg, index) => {
-    if (msg.role === "system" || !msg.content.trim()) return;
+    const hasAttachments = !!(msg.attachments?.length || (index === lastUserIdx && currentAttachments?.length));
+    if (msg.role === "system" || (!msg.content.trim() && !hasAttachments)) return;
 
     if (msg.role === "user" && index === lastUserIdx && currentAttachments?.length) {
       const content = buildUserContent(msg.content, currentAttachments);

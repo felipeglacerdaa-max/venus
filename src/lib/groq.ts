@@ -9,11 +9,6 @@ export const GROQ_MODELS = [
     description: "Equilíbrio ideal entre velocidade e qualidade",
   },
   {
-    id: "llama-3.1-70b-versatile",
-    label: "Llama 3.1 70B",
-    description: "Versão anterior, ainda muito capaz",
-  },
-  {
     id: "llama-3.1-8b-instant",
     label: "Llama 3.1 8B Instant",
     description: "Respostas ultra-rápidas",
